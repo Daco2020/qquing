@@ -11,7 +11,7 @@ export default function ThreeElement() {
 
 
   // 개체를 움직이게 만드는 곳
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     // 중력 효과
     let newVelocity = velocity - 12.8 * delta; // 중력 가속도 적용
     boxRef.current.position.y += newVelocity * delta;
