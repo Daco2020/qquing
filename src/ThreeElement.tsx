@@ -8,13 +8,10 @@ export default function ThreeElement() {
   const boxRef = useRef<THREE.Mesh>(null!)
   const boxCopyRef = useRef<THREE.Mesh>(null!)
   const boxControl = useControls({
-    width : {value:1, min:0.1, max:10, step:0.1},
-    height : {value:1, min:0.1, max:10, step:0.1},
-    depth : {value:1, min:0.1, max:10, step:0.1},
-    withSegments : {value:1, min:1, max:10, step:1},
-    heightSegments : {value:1, min:1, max:10, step:1},
-    depthSegments : {value:1, min:1, max:10, step:1},
-
+    radius: { value: 1, min: 0, max: 10, step: 0.1 },
+    seg: { value: 32, min: 3, max: 64, step: 1 },
+    thetaStart: { value: 0, min: 0, max: 360, step: 0.1 },
+    thetaLength: { value: 360, min: 0, max: 360, step: 0.1 },
   })
 
   // 개체를 움직이게 만드는 곳
@@ -23,7 +20,7 @@ export default function ThreeElement() {
   // 처음 렌더링 될 때만 실행되고 배열에 담긴 값이 바뀔 때만 실행되는 훅
   useEffect(() => {
     boxCopyRef.current.geometry = boxRef.current.geometry
-  },[ boxControl.width, boxControl.height, boxControl.depth, boxControl.withSegments, boxControl.heightSegments, boxControl.depthSegments])
+  },[ boxControl])
 
   return (
     <>
@@ -32,13 +29,18 @@ export default function ThreeElement() {
         ref={boxRef}
         position={[0,0,0]}
         >
-        <boxGeometry args={[boxControl.width, boxControl.height, boxControl.depth, boxControl.withSegments, boxControl.heightSegments, boxControl.depthSegments]}/>
+        <circleGeometry args={[
+          boxControl.radius,
+          boxControl.seg,
+          THREE.MathUtils.degToRad(boxControl.thetaStart),
+          THREE.MathUtils.degToRad(boxControl.thetaLength)
+        ]}/>
         <meshStandardMaterial wireframe/>
       </mesh>
       <mesh
       ref={boxCopyRef}
       >
-        <meshStandardMaterial color="tomato"/>
+        <meshStandardMaterial color="blue"/>
       </mesh>
 
     </>
