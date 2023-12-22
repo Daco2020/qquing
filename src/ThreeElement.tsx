@@ -1,13 +1,14 @@
 import * as THREE from 'three'
-import {useControls} from 'leva'
-import { useFrame } from '@react-three/fiber'
+import { useThree, useFrame } from '@react-three/fiber'
 import { useRef, useState } from 'react'
 
 export default function ThreeElement() {
   // useRef는 개체를 참조하는데 사용되는 훅
-  const boxRef = useRef<THREE.Mesh>(null!)
   const [velocity, setVelocity] = useState(0);
   const [direction, setDirection] = useState(new THREE.Vector3());
+  const {scene} = useThree();
+  const boxRef = useRef<THREE.Mesh>(null!)
+  const groupRef = useRef<THREE.Group>(null!)
 
 
   // 개체를 움직이게 만드는 곳
@@ -36,25 +37,54 @@ export default function ThreeElement() {
     setDirection(new THREE.Vector3(Math.random() * 2 - 1, 0, Math.random() * 2 - 1).normalize()); // 랜덤 방향 설정
   };
 
-  const controls = useControls({
-    xRotation: {value:0, min:-360, max:360, step:1},
-    yRotation: {value:0, min:-360, max:360, step:1}
-  })
+  // scene.rotation.x = THREE.MathUtils.degToRad(45);
+  scene.rotation.x += 0.01;
+  groupRef.current.rotation.y += 0.01;
 
   return (
     <>
       <directionalLight position={[1,5,5]}/>
+      <group
+        ref={groupRef}
+        position={[0,0,0]}
+      >  
       <mesh 
         ref={boxRef}
         onClick={handleClick}
-        position={[0,3,0]}
+        position={[0,0,0]}
+        scale={[1,1,1]}
         rotation={[
-        THREE.MathUtils.degToRad(controls.xRotation),
-        THREE.MathUtils.degToRad(controls.yRotation),
-        0]}>
+          THREE.MathUtils.degToRad(0),
+          THREE.MathUtils.degToRad(0),
+          THREE.MathUtils.degToRad(0)]}>
         <boxGeometry />
         <meshMatcapMaterial color="hotpink" />
       </mesh>
+      <mesh 
+        ref={boxRef}
+        onClick={handleClick}
+        position={[3,0,0]}
+        scale={[1,1,1]}
+        rotation={[
+          THREE.MathUtils.degToRad(0),
+          THREE.MathUtils.degToRad(0),
+          THREE.MathUtils.degToRad(0)]}>
+        <boxGeometry />
+        <meshMatcapMaterial color="tomato" />
+      </mesh>
+      <mesh 
+        ref={boxRef}
+        onClick={handleClick}
+        position={[0,0,3]}
+        scale={[1,1,1]}
+        rotation={[
+          THREE.MathUtils.degToRad(0),
+          THREE.MathUtils.degToRad(0),
+          THREE.MathUtils.degToRad(0)]}>
+        <boxGeometry />
+        <meshMatcapMaterial color="orange" />
+      </mesh>
+      </group>
     </>
   )
 
