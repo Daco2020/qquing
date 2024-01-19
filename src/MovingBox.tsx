@@ -2,99 +2,110 @@ import { useState, useEffect, useRef } from 'react';
 import { Box as BoxMesh } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
-const Box = ({ position }: { position: [number, number, number] }) => (
+const Box = ({ position }) => (
   <BoxMesh position={position}>
     <meshStandardMaterial color="royalblue" />
   </BoxMesh>
 );
 
-const RandomMovingBox = ({setRandomBoxPosition}) => {
-  const boxRef = useRef(); // 박스의 참조를 생성합니다.
+const EnemyMovingBox = ({ position, setRef }) => {
+  const boxRef = useRef();
 
-//   useFrame((_, delta) => {
-//     let newVelocity = velocity - 12.8 * delta;
-//     boxRef.current.position.y += newVelocity * delta;
-//     boxRef.current.position.x += direction.x * delta;
-//     boxRef.current.position.z += direction.z * delta;
+  useEffect(() => {
+    setRef(boxRef); // 상위 컴포넌트로 ref 전달
+  }, [setRef]);
 
-//     if (boxRef.current.position.y <= 0) {
-//       boxRef.current.position.y = 0;
-//       newVelocity *= -0.5;
   useFrame((_, delta) => {
     if (boxRef.current) {
-      boxRef.current.position.z += delta; // 매 프레임마다 Y 축 위치를 1만큼 증가시킵니다.
-      setRandomBoxPosition([boxRef.current.position.x, boxRef.current.position.y, boxRef.current.position.z])
-      // 다른 축(x, z)에 대한 움직임이 필요하다면 여기에 로직을 추가합니다.
+      boxRef.current.position.z += delta * 10; // TODO: 상자가 특정 개수 이상 통과했으면 숫자를 늘려서 난이도를 올릴 수 있음
     }
   });
 
   return (
-    <BoxMesh ref={boxRef} position={[0, 0, -10]}>
-      <meshStandardMaterial color="royalblue" />
+    <BoxMesh ref={boxRef} position={position}>
+      <meshStandardMaterial color="red" />
     </BoxMesh>
   );
 };
 
-
-const MovingBox = ({ onCollision, randomBoxPosition }) => {
-  const [position, setPosition] = useState<[number, number, number]>([0, 0, 0]);
-  // console.log(position, randomBoxPosition)
+const MovingBox = ({ setPosition }) => {
+  const [position, setPositionState] = useState<[number, number, number]>([0, 0, 0]);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event) => {
       switch (event.key) {
         case 'ArrowUp':
-          setPosition(pos => [pos[0], pos[1], pos[2] - 1]);
+          setPositionState(pos => [pos[0], pos[1], pos[2] - 1]);
           break;
         case 'ArrowDown':
-          setPosition(pos => [pos[0], pos[1], pos[2] + 1]);
+          setPositionState(pos => [pos[0], pos[1], pos[2] + 1]);
           break;
         case 'ArrowLeft':
-          setPosition(pos => [pos[0] - 1, pos[1], pos[2]]);
+          setPositionState(pos => [pos[0] - 1, pos[1], pos[2]]);
           break;
         case 'ArrowRight':
-          setPosition(pos => [pos[0] + 1, pos[1], pos[2]]);
+          setPositionState(pos => [pos[0] + 1, pos[1], pos[2]]);
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
-    const checkCollision = () => {
-      console.log(position, randomBoxPosition)
-      if (Math.abs(position[0] - randomBoxPosition[0]) < 1 &&
-          Math.abs(position[1] - randomBoxPosition[1]) < 1 &&
-          Math.abs(position[2] - randomBoxPosition[2]) < 1) {
-        onCollision();
-      }
-    };
-
-    const id = setInterval(checkCollision, 100); // 매 100ms마다 충돌을 확인
-    return () => clearInterval(id);
-  }, [position, randomBoxPosition, onCollision]);
+    setPosition(position);
+  }, [position, setPosition]);
 
   return <Box position={position} />;
 };
 
 const App = () => {
-  const [randomBoxPosition, setRandomBoxPosition] = useState([0, 0, -10]);
-  // console.log(randomBoxPosition, setRandomBoxPosition)
+  const [enemyBoxes, setEnemyBoxes] = useState([]);
+  const [intervalDelay, setIntervalDelay] = useState(500); // 초기 간격을 1초로 설정
+  const enemyRefs = useRef([]);
+  const [playerPosition, setPlayerPosition] = useState([0, 0, 0]);
+
   const handleCollision = () => {
     console.log('충돌!');
-    // alert('게임 오버!');
   };
+
+  useFrame(() => {
+    enemyRefs.current.forEach(ref => {
+      if (ref.current) {
+        const enemyPosition = ref.current.position;
+        if (
+          Math.abs(playerPosition[0] - enemyPosition.x) < 1 &&
+          Math.abs(playerPosition[1] - enemyPosition.y) < 1 &&
+          Math.abs(playerPosition[2] - enemyPosition.z) < 1
+        ) {
+          handleCollision();
+        }
+      }
+    });
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const xPosition = Math.random() * 10 - 5; // 박스의 X 위치
+      const zPosition = -20; // 박스의 Z 위치
+      setEnemyBoxes(enemyBoxes => [...enemyBoxes, [xPosition, 0, zPosition]]);
+
+      // 다음 인터벌의 지연 시간을 업데이트
+      setIntervalDelay(oldDelay => Math.max(150, oldDelay) ); // 50 이하로 가지 않도록, TODO: 상자가 특정 개수 이상 통과했으면 시간을 줄여서 난이도를 올릴 수 있음
+    }, intervalDelay);
+
+    return () => clearInterval(interval);
+  }, [intervalDelay]);
 
   return (
     <>
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-      <MovingBox onCollision={handleCollision} randomBoxPosition={randomBoxPosition}/>
-      <RandomMovingBox setRandomBoxPosition={setRandomBoxPosition}/>
+      <MovingBox setPosition={setPlayerPosition} />
+      {enemyBoxes.map((position, index) => (
+        <EnemyMovingBox key={index} position={position} setRef={(ref) => enemyRefs.current[index] = ref} />
+      ))}
     </>
   );
 };
