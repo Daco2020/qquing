@@ -2,18 +2,11 @@
 > r3f_basic@0.0.0 build
 > tsc && vite build
 
-src/_MovingBox.tsx(11,26): error TS7031: Binding element 'onPositionChange' implicitly has an 'any' type.
 src/_MovingBox.tsx(16,22): error TS2339: Property 'position' does not exist on type 'never'.
 src/_MovingBox.tsx(17,34): error TS2339: Property 'position' does not exist on type 'never'.
 src/_MovingBox.tsx(18,40): error TS2339: Property 'position' does not exist on type 'never'.
 src/_MovingBox.tsx(18,67): error TS2339: Property 'position' does not exist on type 'never'.
 src/_MovingBox.tsx(18,94): error TS2339: Property 'position' does not exist on type 'never'.
-src/_MovingBox.tsx(23,14): error TS2322: Type 'MutableRefObject<undefined>' is not assignable to type 'Ref<Mesh<BufferGeometry<NormalBufferAttributes>, Material | Material[], Object3DEventMap>> | undefined'.
-  Type 'MutableRefObject<undefined>' is not assignable to type 'RefObject<Mesh<BufferGeometry<NormalBufferAttributes>, Material | Material[], Object3DEventMap>>'.
-    Types of property 'current' are incompatible.
-      Type 'undefined' is not assignable to type 'Mesh<BufferGeometry<NormalBufferAttributes>, Material | Material[], Object3DEventMap> | null'.
-src/_MovingBox.tsx(30,22): error TS7031: Binding element 'onCollision' implicitly has an 'any' type.
-src/_MovingBox.tsx(30,35): error TS7031: Binding element 'boxPosition' implicitly has an 'any' type.
 src/MovingBox.tsx(17,34): error TS2749: 'BoxMesh' refers to a value, but is being used as a type here. Did you mean 'typeof BoxMesh'?
 src/MovingBox.tsx(19,25): error TS2749: 'BoxMesh' refers to a value, but is being used as a type here. Did you mean 'typeof BoxMesh'?
 src/MovingBox.tsx(81,45): error TS2749: 'BoxMesh' refers to a value, but is being used as a type here. Did you mean 'typeof BoxMesh'?
