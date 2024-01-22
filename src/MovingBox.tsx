@@ -9,7 +9,7 @@ const Box = ({ position }) => (
 );
 
 const EnemyMovingBox = ({ position, setRef }) => {
-  const boxRef = useRef();
+  const boxRef = useRef<BoxMesh>(null); // 타입을 BoxMesh로 지정
 
   useEffect(() => {
     setRef(boxRef); // 상위 컴포넌트로 ref 전달
@@ -32,7 +32,7 @@ const MovingBox = ({ setPosition }) => {
   const [position, setPositionState] = useState<[number, number, number]>([0, 0, 0]);
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => { // 타입을 명시적으로 KeyboardEvent로 지정
       switch (event.key) {
         case 'ArrowUp':
           setPositionState(pos => [pos[0], pos[1], pos[2] - 1]);
@@ -60,10 +60,10 @@ const MovingBox = ({ setPosition }) => {
   return <Box position={position} />;
 };
 
-const App = ({ setCount }) => { // setCount를 props로 전달
+const App = ({ setCount }: { setCount: (count: number) => void }) => { // setCount를 props로 전달하고 타입을 명시적으로 지정
   const [enemyBoxes, setEnemyBoxes] = useState<number[][]>([]); // 타입 지정
   const [intervalDelay, setIntervalDelay] = useState<number>(500); // 타입 지정
-  const enemyRefs = useRef<(React.MutableRefObject<BoxMesh | undefined>)[]>([]); // 타입 지정
+  const enemyRefs = useRef<(React.MutableRefObject<BoxMesh | null>)[]>([]); // 타입 지정
   const [playerPosition, setPlayerPosition] = useState<[number, number, number]>([0, 0, 0]); // 타입 지정
 
   const handleCollision = () => {
