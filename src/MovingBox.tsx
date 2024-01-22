@@ -60,7 +60,7 @@ const MovingBox = ({ setPosition }) => {
   return <Box position={position} />;
 };
 
-const App = () => {
+const App = ({setCount}) => {
   const [enemyBoxes, setEnemyBoxes] = useState([]);
   const [intervalDelay, setIntervalDelay] = useState(500); // 초기 간격을 1초로 설정
   const enemyRefs = useRef([]);
@@ -68,6 +68,7 @@ const App = () => {
 
   const handleCollision = () => {
     console.log('충돌!');
+    setCount(count => count + 1);
   };
 
   useFrame(() => {
