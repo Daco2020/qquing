@@ -60,19 +60,19 @@ const MovingBox = ({ setPosition }) => {
   return <Box position={position} />;
 };
 
-const App = ({setCount}) => {
-  const [enemyBoxes, setEnemyBoxes] = useState([]);
-  const [intervalDelay, setIntervalDelay] = useState(500); // 초기 간격을 1초로 설정
-  const enemyRefs = useRef([]);
-  const [playerPosition, setPlayerPosition] = useState([0, 0, 0]);
+const App = ({ setCount }) => { // setCount를 props로 전달
+  const [enemyBoxes, setEnemyBoxes] = useState<number[][]>([]); // 타입 지정
+  const [intervalDelay, setIntervalDelay] = useState<number>(500); // 타입 지정
+  const enemyRefs = useRef<(React.MutableRefObject<BoxMesh | undefined>)[]>([]); // 타입 지정
+  const [playerPosition, setPlayerPosition] = useState<[number, number, number]>([0, 0, 0]); // 타입 지정
 
   const handleCollision = () => {
     console.log('충돌!');
-    setCount(count => count + 1);
+    setCount((count: number) => count + 1); // 타입 지정
   };
 
   useFrame(() => {
-    enemyRefs.current.forEach(ref => {
+    enemyRefs.current.forEach((ref) => {
       if (ref.current) {
         const enemyPosition = ref.current.position;
         if (
@@ -90,10 +90,10 @@ const App = ({setCount}) => {
     const interval = setInterval(() => {
       const xPosition = Math.random() * 10 - 5; // 박스의 X 위치
       const zPosition = -20; // 박스의 Z 위치
-      setEnemyBoxes(enemyBoxes => [...enemyBoxes, [xPosition, 0, zPosition]]);
+      setEnemyBoxes((enemyBoxes: number[][]) => [...enemyBoxes, [xPosition, 0, zPosition]]); // 타입 지정
 
       // 다음 인터벌의 지연 시간을 업데이트
-      setIntervalDelay(oldDelay => Math.max(150, oldDelay) ); // 50 이하로 가지 않도록, TODO: 상자가 특정 개수 이상 통과했으면 시간을 줄여서 난이도를 올릴 수 있음
+      setIntervalDelay((oldDelay: number) => Math.max(150, oldDelay)); // 타입 지정
     }, intervalDelay);
 
     return () => clearInterval(interval);
@@ -105,7 +105,11 @@ const App = ({setCount}) => {
       <pointLight position={[10, 10, 10]} />
       <MovingBox setPosition={setPlayerPosition} />
       {enemyBoxes.map((position, index) => (
-        <EnemyMovingBox key={index} position={position} setRef={(ref) => enemyRefs.current[index] = ref} />
+        <EnemyMovingBox
+          key={index}
+          position={position}
+          setRef={(ref) => (enemyRefs.current[index] = ref)}
+        />
       ))}
     </>
   );
